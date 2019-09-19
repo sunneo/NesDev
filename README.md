@@ -8,7 +8,7 @@ This project adopts following components:
 * [Json.net](https://github.com/JamesNK/Newtonsoft.Json) - from nuget
 * [NAudio](https://github.com/naudio/NAudio) - from nuget
 * [AForge.NET](https://github.com/andrewkirillov/AForge.NET) - from nuget
-* [BumpKit](https://github.com/DataDink/Bumpkit)
+* [BumpKit](https://github.com/DataDink/Bumpkit) - from nuget
 
 initiate idea:
 an IDE for nes, which provides code editor, debugger, program launcher, music/sound editor, and sprite editor.
