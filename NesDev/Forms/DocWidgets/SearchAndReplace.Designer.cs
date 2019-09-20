@@ -34,23 +34,23 @@
             this.buttonClose = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.textBoxReplaceText = new System.Windows.Forms.TextBox();
-            this.buttonReplace = new System.Windows.Forms.Button();
             this.buttonReplaceAll = new System.Windows.Forms.Button();
+            this.buttonReplace = new System.Windows.Forms.Button();
+            this.textBoxReplaceText = new System.Windows.Forms.TextBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.checkBoxWholeMatch = new System.Windows.Forms.CheckBox();
+            this.checkBoxMatchCase = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.panel4 = new System.Windows.Forms.Panel();
             this.buttonSwitchMode = new System.Windows.Forms.Button();
-            this.checkBoxMatchCase = new System.Windows.Forms.CheckBox();
-            this.checkBoxWholeMatch = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -121,16 +121,6 @@
             this.panel1.Size = new System.Drawing.Size(319, 30);
             this.panel1.TabIndex = 0;
             // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.checkBoxWholeMatch);
-            this.panel2.Controls.Add(this.checkBoxMatchCase);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(0, 63);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(349, 27);
-            this.panel2.TabIndex = 0;
-            // 
             // panel3
             // 
             this.panel3.Controls.Add(this.buttonReplaceAll);
@@ -142,16 +132,19 @@
             this.panel3.Size = new System.Drawing.Size(319, 29);
             this.panel3.TabIndex = 0;
             // 
-            // textBoxReplaceText
+            // buttonReplaceAll
             // 
-            this.textBoxReplaceText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxReplaceText.Location = new System.Drawing.Point(3, 3);
-            this.textBoxReplaceText.Margin = new System.Windows.Forms.Padding(0);
-            this.textBoxReplaceText.Name = "textBoxReplaceText";
-            this.textBoxReplaceText.Size = new System.Drawing.Size(221, 23);
-            this.textBoxReplaceText.TabIndex = 0;
-            this.toolTip1.SetToolTip(this.textBoxReplaceText, "Replace To");
+            this.buttonReplaceAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonReplaceAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonReplaceAll.Location = new System.Drawing.Point(276, 3);
+            this.buttonReplaceAll.Margin = new System.Windows.Forms.Padding(0);
+            this.buttonReplaceAll.Name = "buttonReplaceAll";
+            this.buttonReplaceAll.Size = new System.Drawing.Size(37, 23);
+            this.buttonReplaceAll.TabIndex = 2;
+            this.buttonReplaceAll.Text = "Ra";
+            this.toolTip1.SetToolTip(this.buttonReplaceAll, "Replace All");
+            this.buttonReplaceAll.UseVisualStyleBackColor = true;
+            this.buttonReplaceAll.Click += new System.EventHandler(this.buttonReplaceAll_Click);
             // 
             // buttonReplace
             // 
@@ -167,19 +160,46 @@
             this.buttonReplace.UseVisualStyleBackColor = true;
             this.buttonReplace.Click += new System.EventHandler(this.buttonReplace_Click);
             // 
-            // buttonReplaceAll
+            // textBoxReplaceText
             // 
-            this.buttonReplaceAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonReplaceAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonReplaceAll.Location = new System.Drawing.Point(276, 3);
-            this.buttonReplaceAll.Margin = new System.Windows.Forms.Padding(0);
-            this.buttonReplaceAll.Name = "buttonReplaceAll";
-            this.buttonReplaceAll.Size = new System.Drawing.Size(37, 23);
-            this.buttonReplaceAll.TabIndex = 2;
-            this.buttonReplaceAll.Text = "Ra";
-            this.toolTip1.SetToolTip(this.buttonReplaceAll, "Replace All");
-            this.buttonReplaceAll.UseVisualStyleBackColor = true;
-            this.buttonReplaceAll.Click += new System.EventHandler(this.buttonReplaceAll_Click);
+            this.textBoxReplaceText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxReplaceText.Location = new System.Drawing.Point(3, 3);
+            this.textBoxReplaceText.Margin = new System.Windows.Forms.Padding(0);
+            this.textBoxReplaceText.Name = "textBoxReplaceText";
+            this.textBoxReplaceText.Size = new System.Drawing.Size(221, 23);
+            this.textBoxReplaceText.TabIndex = 0;
+            this.toolTip1.SetToolTip(this.textBoxReplaceText, "Replace To");
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.checkBoxWholeMatch);
+            this.panel2.Controls.Add(this.checkBoxMatchCase);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel2.Location = new System.Drawing.Point(0, 63);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(349, 27);
+            this.panel2.TabIndex = 0;
+            // 
+            // checkBoxWholeMatch
+            // 
+            this.checkBoxWholeMatch.AutoSize = true;
+            this.checkBoxWholeMatch.Location = new System.Drawing.Point(114, 3);
+            this.checkBoxWholeMatch.Name = "checkBoxWholeMatch";
+            this.checkBoxWholeMatch.Size = new System.Drawing.Size(97, 19);
+            this.checkBoxWholeMatch.TabIndex = 1;
+            this.checkBoxWholeMatch.Text = "Whole Match";
+            this.checkBoxWholeMatch.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxMatchCase
+            // 
+            this.checkBoxMatchCase.AutoSize = true;
+            this.checkBoxMatchCase.Location = new System.Drawing.Point(12, 3);
+            this.checkBoxMatchCase.Name = "checkBoxMatchCase";
+            this.checkBoxMatchCase.Size = new System.Drawing.Size(88, 19);
+            this.checkBoxMatchCase.TabIndex = 0;
+            this.checkBoxMatchCase.Text = "Match Case";
+            this.checkBoxMatchCase.UseVisualStyleBackColor = true;
             // 
             // panel4
             // 
@@ -202,28 +222,9 @@
             this.buttonSwitchMode.UseVisualStyleBackColor = true;
             this.buttonSwitchMode.Click += new System.EventHandler(this.buttonSwitchMode_Click);
             // 
-            // checkBoxMatchCase
-            // 
-            this.checkBoxMatchCase.AutoSize = true;
-            this.checkBoxMatchCase.Location = new System.Drawing.Point(12, 3);
-            this.checkBoxMatchCase.Name = "checkBoxMatchCase";
-            this.checkBoxMatchCase.Size = new System.Drawing.Size(88, 19);
-            this.checkBoxMatchCase.TabIndex = 0;
-            this.checkBoxMatchCase.Text = "Match Case";
-            this.checkBoxMatchCase.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxWholeMatch
-            // 
-            this.checkBoxWholeMatch.AutoSize = true;
-            this.checkBoxWholeMatch.Location = new System.Drawing.Point(114, 3);
-            this.checkBoxWholeMatch.Name = "checkBoxWholeMatch";
-            this.checkBoxWholeMatch.Size = new System.Drawing.Size(97, 19);
-            this.checkBoxWholeMatch.TabIndex = 1;
-            this.checkBoxWholeMatch.Text = "Whole Match";
-            this.checkBoxWholeMatch.UseVisualStyleBackColor = true;
-            // 
             // SearchAndReplace
             // 
+            this.AcceptButton = this.buttonFind;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(349, 90);
@@ -243,10 +244,10 @@
             this.splitContainer1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.panel4.ResumeLayout(false);
             this.ResumeLayout(false);
 

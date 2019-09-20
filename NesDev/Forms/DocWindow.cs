@@ -154,12 +154,23 @@ namespace NesDev.Forms
                 this.scintilla1.Markers[(int)ScintillaNET.MarkerSymbol.Circle].SetForeColor(Color.Red);
                 this.scintilla1.Markers[(int)ScintillaNET.MarkerSymbol.Circle].SetBackColor(Color.Yellow);
                 this.scintilla1.KeyPress += scintilla1_KeyPress;
+                this.scintilla1.KeyUp += scintilla1_KeyUp;
                 this.scintilla1.TextChanged += scintilla1_TextChanged;
                 
             }
             catch (Exception ee)
             {
                 GlobalEvents.NotifyException(this, ee);
+            }
+        }
+
+        void scintilla1_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F3)
+            {
+                ShowSearchBox(false);
+                if(!String.IsNullOrEmpty(mSearchReplaceDlg.Context.SearchPattern))
+                    mSearchReplaceDlg.PerformFind();
             }
         }
         protected override void OnLocationChanged(EventArgs e)
@@ -200,7 +211,7 @@ namespace NesDev.Forms
             mSearchReplaceDlg.OnFindClick += mSearchReplaceDlg_OnFindClick;
             mSearchReplaceDlg.OnReplaceAllClick += mSearchReplaceDlg_OnReplaceAllClick;
             mSearchReplaceDlg.OnReplaceClick += mSearchReplaceDlg_OnReplaceClick;
-            mSearchReplaceDlg.Focus();
+           
             
         }
         protected override void OnFormClosed(FormClosedEventArgs e)
@@ -223,6 +234,7 @@ namespace NesDev.Forms
             
         }
 
+        
         void mSearchReplaceDlg_OnFindClick(object sender, SearchAndReplace.FindEventArgs e)
         {
             this.scintilla1.SearchFlags = ScintillaNET.SearchFlags.None;
@@ -234,10 +246,19 @@ namespace NesDev.Forms
             }
             this.scintilla1.SearchFlags |= ScintillaNET.SearchFlags.WordStart;
             this.scintilla1.TargetStart = scintilla1.CurrentPosition;
+            if (mSearchReplaceDlg.Context.Started && mSearchReplaceDlg.Context.LastResult == -1)
+            {
+                this.scintilla1.TargetStart = 0;
+            }
             this.scintilla1.TargetEnd = scintilla1.TextLength;
+
             int idx = this.scintilla1.SearchInTarget(e.Pattern);
+            this.mSearchReplaceDlg.Context.Started = true;
+            this.mSearchReplaceDlg.Context.StartIndex = this.scintilla1.TargetStart;
+            this.mSearchReplaceDlg.Context.LastResult = idx;
             if (idx != -1)
             {
+                this.GotoLine(this.scintilla1.LineFromPosition(idx));
                 this.scintilla1.SelectionStart = idx;
                 this.scintilla1.SelectionEnd = idx + e.Pattern.Length;
             }
@@ -246,22 +267,34 @@ namespace NesDev.Forms
                 this.scintilla1.SelectionEnd = this.scintilla1.SelectionStart;
             }
         }
+        private void ShowSearchBox(bool breplace)
+        {
+            if (mSearchReplaceDlg == null || mSearchReplaceDlg.IsDisposed)
+            {
+                mSearchReplaceDlg = new SearchAndReplace();
+                InitSearchWindow();
+            }
+            mSearchReplaceDlg.StartPosition = FormStartPosition.Manual;
+            mSearchReplaceDlg.Location = PointToScreen(new Point(this.Right - mSearchReplaceDlg.Width, this.Top));
+            if (!mSearchReplaceDlg.Visible)
+                mSearchReplaceDlg.Show(this);
+            mSearchReplaceDlg.SetMode(breplace);
+            if (!String.IsNullOrEmpty(scintilla1.SelectedText))
+            {
+                mSearchReplaceDlg.SetSearchText(scintilla1.SelectedText);
+            }
+            mSearchReplaceDlg.BringToFront();
+            mSearchReplaceDlg.Focus();
+            mSearchReplaceDlg.Select();
+            mSearchReplaceDlg.SetFocus();
+        }
+
         void scintilla1_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!ModifierKeys.HasFlag(Keys.Control)) return;
             if (e.KeyChar== 0x06) // ctrl+f
             {
-                if (mSearchReplaceDlg == null || mSearchReplaceDlg.IsDisposed)
-                {
-                    mSearchReplaceDlg = new SearchAndReplace();
-                    InitSearchWindow();
-                }
-                mSearchReplaceDlg.StartPosition = FormStartPosition.Manual;
-                mSearchReplaceDlg.Location = PointToScreen(new Point(this.Right - mSearchReplaceDlg.Width, this.Top));
-                mSearchReplaceDlg.SetMode(false);
-                if(!mSearchReplaceDlg.Visible)
-                    mSearchReplaceDlg.Show(this);
-                mSearchReplaceDlg.BringToFront();
+                ShowSearchBox(false);
                 e.Handled = true;
             }
             else if (e.KeyChar == 0x7) // ctrl+g
@@ -279,17 +312,7 @@ namespace NesDev.Forms
             }
             else if (e.KeyChar == 0x8) // ctrl+h
             {
-                if (mSearchReplaceDlg == null || mSearchReplaceDlg.IsDisposed)
-                {
-                    mSearchReplaceDlg = new SearchAndReplace();
-                    InitSearchWindow();
-                }
-                mSearchReplaceDlg.StartPosition = FormStartPosition.Manual;
-                mSearchReplaceDlg.Location = PointToScreen(new Point(this.Right - mSearchReplaceDlg.Width, this.Top));
-                mSearchReplaceDlg.SetMode(true);
-                if (!mSearchReplaceDlg.Visible)
-                    mSearchReplaceDlg.Show(this);
-                mSearchReplaceDlg.BringToFront();
+                ShowSearchBox(true);
                 e.Handled = true;
             }
             else if(e.KeyChar == 0x13) // ctrl+s
