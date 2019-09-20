@@ -40,28 +40,20 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AForge, Version=2.2.5.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
+    <Reference Include="AForge.Video">
+      <HintPath>Libraries\AForge\AForge.Video.dll</HintPath>
     </Reference>
-    <Reference Include="AForge.Video, Version=2.2.5.0, Culture=neutral, PublicKeyToken=cbfb6e07d173c401, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\AForge\AForge.Video.dll</HintPath>
+    <Reference Include="AForge.Video.FFMPEG">
+      <HintPath>Libraries\AForge\AForge.Video.FFMPEG.dll</HintPath>
     </Reference>
-    <Reference Include="AForge.Video.FFMPEG, Version=2.2.5.0, Culture=neutral, PublicKeyToken=03563089b1be05dd, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\AForge\AForge.Video.FFMPEG.dll</HintPath>
+    <Reference Include="BumpKit">
+      <HintPath>Libraries\BumpKit\BumpKit.dll</HintPath>
     </Reference>
-    <Reference Include="BumpKit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\BumpKit\BumpKit.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\NAudio\NAudio.dll</HintPath>
+    <Reference Include="NAudio">
+      <HintPath>Libraries\NAudio\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="NAudio.WindowsMediaFormat">
-      <HintPath>..\Libraries\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
+      <HintPath>Libraries\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
