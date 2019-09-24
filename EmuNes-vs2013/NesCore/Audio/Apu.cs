@@ -123,7 +123,7 @@ namespace NesCore.Audio
                 filterChain.Filters.Clear();
                 //filterChain.Filters.Add(FirstOrderFilter.CreateHighPassFilter(value, 20f));
                 //filterChain.Filters.Add(FirstOrderFilter.CreateHighPassFilter(value, 440f));
-                filterChain.Filters.Add(FirstOrderFilter.CreateLowPassFilter(value, 22000f));
+                //filterChain.Filters.Add(FirstOrderFilter.CreateLowPassFilter(value, 22000f));
             }
         }
 
@@ -173,10 +173,10 @@ namespace NesCore.Audio
 
             StepTimer();
 
-            int lastCycleFrame = (int)((double)lastCycle / FrameCounterRate);
-            int nextCycleFrame = (int)((double)nextCycle / FrameCounterRate);
+            //int lastCycleFrame = (int)((double)lastCycle / FrameCounterRate);
+            //int nextCycleFrame = (int)((double)nextCycle / FrameCounterRate);
 
-            if (lastCycleFrame != nextCycleFrame)
+            //if (lastCycleFrame != nextCycleFrame)
                 StepFrameCounter();
 
             int lastCycleSample = (int)((double)lastCycle / SampleRate);

@@ -55,6 +55,18 @@
     <Reference Include="NAudio.WindowsMediaFormat">
       <HintPath>Libraries\NAudio\NAudio.WindowsMediaFormat.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX">
+      <HintPath>..\..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct2D1">
+      <HintPath>..\..\packages\SharpDX.Direct2D1.4.2.0\lib\net45\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\..\packages\SharpDX.Direct3D11.4.2.0\lib\net45\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>..\..\packages\SharpDX.DXGI.4.2.0\lib\net45\SharpDX.DXGI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -129,6 +141,9 @@
     <Compile Include="Input\WindowsMultiMedia.cs" />
     <Compile Include="Settings\ZapperSettings.cs" />
     <Compile Include="Settings\JoypadSettings.cs" />
+    <Compile Include="SharpDXRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ToolStripStatusHistoryLabel.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -783,13 +783,14 @@ namespace SharpNes
         {
             Console.Audio.SampleRate = 44100;
 
-            float[] outputBuffer = new float[256];
+            float[] outputBuffer = new float[4096];
             int writeIndex = 0;
 
             apuAudioProvider = new ApuAudioProvider();
 
             Console.Audio.WriteSample = (sampleValue) =>
             {
+                
                 // fill buffer
                 outputBuffer[writeIndex++] = sampleValue;
                 writeIndex %= outputBuffer.Length;
@@ -797,10 +798,11 @@ namespace SharpNes
                 // when buffer full, send to wave provider
                 if (writeIndex == 0)
                     apuAudioProvider.Queue(outputBuffer);
+                 
             };
 
             waveOut = new WaveOut();
-            waveOut.DesiredLatency = 100;
+            waveOut.DesiredLatency =500;
 
             waveOut.Init(apuAudioProvider);
 

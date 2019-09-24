@@ -531,7 +531,9 @@ namespace SharpNes
             {
                 // do not render top and bottom 8 rows
                 if (y < 8 || y > 231)
-                    colour = Colour.Black;
+                {
+                    return;
+                }
 
                 int offset = (y * 256 + x) * 4;
 
@@ -557,30 +559,39 @@ namespace SharpNes
 
         private void ConfigureAudio()
         {
-            Console.Audio.SampleRate = 44100;
-
-            float[] outputBuffer = new float[256];
-            int writeIndex = 0;
-
+            waveOut = new WaveOut();
             apuAudioProvider = new ApuAudioProvider();
 
+            waveOut.DesiredLatency = 100;
+            waveOut.Init(apuAudioProvider);
+            Console.Audio.SampleRate = waveOut.OutputWaveFormat.SampleRate;
+            float[] outputBuffer = new float[waveOut.OutputWaveFormat.SampleRate/4];
+            
+            int writeIndex = 0;
+
+            
             Console.Audio.WriteSample = (sampleValue) =>
             {
                 // fill buffer
                 outputBuffer[writeIndex++] = sampleValue;
                 if (writeIndex >= outputBuffer.Length)
                 {
-                    apuAudioProvider.Queue(outputBuffer);
+                    float[] buf = outputBuffer;
+                    outputBuffer = new float[waveOut.OutputWaveFormat.SampleRate / 4];
+                    writeIndex = 0;
+                    ThreadPool.QueueUserWorkItem((s) => {
+                        apuAudioProvider.Queue(buf);
+                    });
+                    
                     // when buffer full, send to wave provider
                     writeIndex = 0;
                         
                 }
             };
 
-            waveOut = new WaveOut();
-            waveOut.DesiredLatency = 100;
-
-            waveOut.Init(apuAudioProvider);
+            
+            
+            
 
         }
 
