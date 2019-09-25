@@ -537,9 +537,9 @@ namespace SharpNes
 
                 int offset = (y * 256 + x) * 4;
 
-                bitmapBuffer.Bits[offset++] = colour.Blue;
-                bitmapBuffer.Bits[offset++] = colour.Green;
-                bitmapBuffer.Bits[offset] = colour.Red;
+                bitmapBuffer.Bits[offset] = colour.bits[0];
+                bitmapBuffer.Bits[offset + 1] = colour.bits[1];
+                bitmapBuffer.Bits[offset + 2] = colour.bits[2];
             };
             Console.Video.ShowFrame = () =>
             {
@@ -565,7 +565,7 @@ namespace SharpNes
             waveOut.DesiredLatency = 100;
             waveOut.Init(apuAudioProvider);
             Console.Audio.SampleRate = waveOut.OutputWaveFormat.SampleRate;
-            float[] outputBuffer = new float[waveOut.OutputWaveFormat.SampleRate/4];
+            float[] outputBuffer = new float[1000];
             
             int writeIndex = 0;
 
@@ -576,15 +576,18 @@ namespace SharpNes
                 outputBuffer[writeIndex++] = sampleValue;
                 if (writeIndex >= outputBuffer.Length)
                 {
+                    apuAudioProvider.Queue(outputBuffer);
+                    writeIndex = 0;
+                    /*
                     float[] buf = outputBuffer;
-                    outputBuffer = new float[waveOut.OutputWaveFormat.SampleRate / 4];
+                    outputBuffer = new float[4000];
                     writeIndex = 0;
                     ThreadPool.QueueUserWorkItem((s) => {
                         apuAudioProvider.Queue(buf);
                     });
-                    
+                    */
                     // when buffer full, send to wave provider
-                    writeIndex = 0;
+                    
                         
                 }
             };

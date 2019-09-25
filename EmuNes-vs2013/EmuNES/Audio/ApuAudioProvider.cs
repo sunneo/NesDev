@@ -11,7 +11,7 @@ namespace SharpNes.Audio
     {
         public ApuAudioProvider()
         {
-            cyclicBuffer = new float[base.WaveFormat.SampleRate];
+            cyclicBuffer = new float[4410];
             readIndex = writeIndex = 0;
             Enabled = true;
         }
@@ -57,7 +57,7 @@ namespace SharpNes.Audio
             }
         }
 
-        private float[] cyclicBuffer = new float[22050];
+        private float[] cyclicBuffer = new float[4410];
         private int readIndex;
         private int writeIndex;
         private int size;

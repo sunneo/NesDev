@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NesCore", "EmuNes-vs2013\Ne
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpNES", "EmuNes-vs2013\EmuNES\SharpNES.csproj", "{2024F253-DE99-411D-B87F-9D96C8D30846}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalfNes", "HalfNes\HalfNes.csproj", "{BCAC5628-661E-4452-8D77-3EC6232F9EAD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,10 +35,6 @@ Global
 		{2024F253-DE99-411D-B87F-9D96C8D30846}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2024F253-DE99-411D-B87F-9D96C8D30846}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2024F253-DE99-411D-B87F-9D96C8D30846}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BCAC5628-661E-4452-8D77-3EC6232F9EAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCAC5628-661E-4452-8D77-3EC6232F9EAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BCAC5628-661E-4452-8D77-3EC6232F9EAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BCAC5628-661E-4452-8D77-3EC6232F9EAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +42,5 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{D0BB9378-43C2-4B6D-A13C-CAD4F7739785} = {F1379838-2179-4310-9FEC-AE15A4E3BEF3}
 		{2024F253-DE99-411D-B87F-9D96C8D30846} = {F1379838-2179-4310-9FEC-AE15A4E3BEF3}
-		{BCAC5628-661E-4452-8D77-3EC6232F9EAD} = {F1379838-2179-4310-9FEC-AE15A4E3BEF3}
 	EndGlobalSection
 EndGlobal

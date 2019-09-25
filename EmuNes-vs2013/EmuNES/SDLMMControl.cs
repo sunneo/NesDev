@@ -485,7 +485,7 @@ namespace SharpNes
             if (x < 0 || y < 0 || x >= Width || y >= Height) return;
             //lock (canvas)
             {
-                canvas.SetPixel(x, y, Color.FromArgb(color));
+                canvas.SetPixel(x, y, coveredColor(color));
             }
         }
         public void drawEllipse(int x, int y, int w, int h, int color)

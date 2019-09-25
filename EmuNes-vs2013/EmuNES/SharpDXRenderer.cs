@@ -30,6 +30,10 @@ namespace SharpNes
         public static readonly int MOUSE_MIDDLE = 1;
         public static readonly int MOUSE_RIGHT = 2;
         bool useAlpha = true;
+        public SharpDXRenderer()
+        {
+            this.DoubleBuffered = true;
+        }
         public void setUseAlpha(bool buse)
         {
             useAlpha = buse;
@@ -158,7 +162,7 @@ namespace SharpNes
                     Texture2D backBuffer = Resource.FromSwapChain<Texture2D>(swapChain, 0);
 
                     Surface surface = backBuffer.QueryInterface<Surface>();
-
+                    
                     d2dRenderTarget = new RenderTarget(d2dFactory, surface,
                         new RenderTargetProperties(new PixelFormat(Format.Unknown, AlphaMode.Premultiplied)));
 
@@ -332,9 +336,9 @@ namespace SharpNes
             }
             return ret;
         }
-        private SharpDX.Direct2D1.Brush GetBrushFromColor(int color)
+        private SharpDX.Direct2D1.Brush GetBrushFromColor(RenderTarget target, int color)
         {
-            SharpDX.Direct2D1.SolidColorBrush brush = new SolidColorBrush(d2dRenderTarget, coveredColor(color));
+            SharpDX.Direct2D1.SolidColorBrush brush = new SolidColorBrush(target, coveredColor(color));
             return brush;
         }
         public void drawString(String str, System.Drawing.Rectangle rect, int color, System.Drawing.Font font = null)
@@ -351,7 +355,7 @@ namespace SharpNes
 
                     if (!String.IsNullOrEmpty(str))
                     {
-                        using (Brush brush = GetBrushFromColor(color))
+                        using (Brush brush = GetBrushFromColor(target,color))
                         {
                             SharpDX.DirectWrite.FontWeight weight = WeightFromFontStyle(font.Style);
                             SharpDX.DirectWrite.FontStyle style = StyleFromFontStyle(font.Style);
@@ -372,7 +376,7 @@ namespace SharpNes
 
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = GetBrushFromColor(color))
+                    using (var brush = GetBrushFromColor(target, color))
                     {
                         target.DrawLine(new RawVector2(x0, y0), new RawVector2(x1, y1), brush, width);
                     }
@@ -385,7 +389,7 @@ namespace SharpNes
             {
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = GetBrushFromColor(color))
+                    using (var brush = GetBrushFromColor(target, color))
                     {
                         Ellipse ell = new Ellipse(new RawVector2(x, y), w, h);
                         target.DrawEllipse(ell, brush);
@@ -393,7 +397,7 @@ namespace SharpNes
                 });
             }
         }
-        private Brush BrushFromGDIBrush(System.Drawing.Brush brush)
+        private Brush BrushFromGDIBrush(RenderTarget target, System.Drawing.Brush brush)
         {
             
             if (brush is System.Drawing.Drawing2D.LinearGradientBrush)
@@ -410,18 +414,18 @@ namespace SharpNes
                     stops[i].Color = ToRawColor4(linear.InterpolationColors.Colors[i]);
                     stops[i].Position = linear.InterpolationColors.Positions[i];
                 }
-                GradientStopCollection stopCollection = new GradientStopCollection(d2dRenderTarget, stops, ExtendMode.Clamp);
-                LinearGradientBrush ret = new LinearGradientBrush(d2dRenderTarget, prop, stopCollection);
+                GradientStopCollection stopCollection = new GradientStopCollection(target, stops, ExtendMode.Clamp);
+                LinearGradientBrush ret = new LinearGradientBrush(target, prop, stopCollection);
                 return ret;
             }
             else if (brush is System.Drawing.SolidBrush)
             {
                 System.Drawing.SolidBrush solid = (System.Drawing.SolidBrush)brush;
-                return GetBrushFromColor(solid.Color.ToArgb());
+                return GetBrushFromColor(target, solid.Color.ToArgb());
             }
             else
             {
-                return GetBrushFromColor(0);
+                return GetBrushFromColor(target, 0);
             }
         }
         public void fillEllipse(int x, int y, int w, int h, int color)
@@ -430,7 +434,7 @@ namespace SharpNes
             {
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = GetBrushFromColor(color))
+                    using (var brush = GetBrushFromColor(target,color))
                     {
                         dxFillEllipse(target, x, y, w, h, brush);
                     }
@@ -444,7 +448,7 @@ namespace SharpNes
             {
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = BrushFromGDIBrush(gdibrush))
+                    using (var brush = BrushFromGDIBrush(target,gdibrush))
                     {
                         dxFillEllipse(target, x, y, w, h, brush);
                     }
@@ -476,14 +480,14 @@ namespace SharpNes
             fillRect(x, y, 1, 1, color);
         }
         StrokeStyle mDashedStyle;
-        StrokeStyle GetDashedStyle()
+        StrokeStyle GetDashedStyle(RenderTarget target)
         {
             if (mDashedStyle == null)
             {
                 StrokeStyleProperties prop = new StrokeStyleProperties();
                 prop.DashStyle = DashStyle.DashDotDot;
                 prop.DashOffset = 2.0f;
-                mDashedStyle = new StrokeStyle(this.d2dRenderTarget.Factory, prop);
+                mDashedStyle = new StrokeStyle(target.Factory, prop);
             }
             return mDashedStyle;
         }
@@ -493,11 +497,11 @@ namespace SharpNes
             {
                 DrawRequests.Add((target) =>
                 {
-                    using (Brush brush = GetBrushFromColor(color))
+                    using (Brush brush = GetBrushFromColor(target,color))
                     {
                         if (dashed)
                         {
-                            target.DrawRectangle(new RawRectangleF(x, y, x + w, y + h), brush, width, GetDashedStyle());
+                            target.DrawRectangle(new RawRectangleF(x, y, x + w, y + h), brush, width, GetDashedStyle(target));
                         }
                         else
                         {
@@ -513,7 +517,7 @@ namespace SharpNes
             {
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = GetBrushFromColor(color))
+                    using (var brush = GetBrushFromColor(target,color))
                     {
                         dxFillRect(target, x, y, w, h, brush);
                     }
@@ -546,7 +550,7 @@ namespace SharpNes
             {
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = BrushFromGDIBrush(gdibrush))
+                    using (var brush = BrushFromGDIBrush(target,gdibrush))
                     {
                         dxFillRect(target, x, y, w, h, brush);
                     }
@@ -583,6 +587,7 @@ namespace SharpNes
         }
         public void flush()
         {
+            
             this.Invalidate();
         }
         protected override void OnPaint(PaintEventArgs e)
@@ -593,6 +598,6 @@ namespace SharpNes
             
             e.Graphics.Flush();
         }
-
+        
     }
 }
