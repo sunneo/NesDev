@@ -23,6 +23,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Nes.ico</ApplicationIcon>
@@ -128,6 +130,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Input\MouseState.cs" />
+    <Compile Include="IRenderer.cs" />
+    <Compile Include="SDLMMControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Settings\ControllerSettings.cs" />
     <Compile Include="Settings\InputSettings.cs" />
     <Compile Include="Input\KeyboardState.cs" />
