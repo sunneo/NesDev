@@ -358,7 +358,9 @@ namespace SharpNes
         {
             lock (_drawReqLock)
             {
-                DrawRequests.Add((target) => {
+
+                DrawRequests.Add((target) =>
+                {
                     using (var brush = GetBrushFromColor(color))
                     {
                         target.DrawLine(new RawVector2(x0, y0), new RawVector2(x1, y1), brush, width);
@@ -400,7 +402,7 @@ namespace SharpNes
         }
         public void drawCircle(int n_cx, int n_cy, int radius, int pixel)
         {
-            int halfRadius=radius/2;
+            int halfRadius = radius / 2;
             drawEllipse(n_cx - halfRadius, n_cy - halfRadius, radius, radius, pixel);
         }
         public void fillCircle(int n_cx, int n_cy, int radius, int pixel)
@@ -420,7 +422,7 @@ namespace SharpNes
                 {
                     using (var brush = GetBrushFromColor(color))
                     {
-                        target.DrawRectangle(new RawRectangleF(x,y,x+w,y+h),brush);
+                        target.DrawRectangle(new RawRectangleF(x, y, x + w, y + h), brush);
                     }
                 });
             }
