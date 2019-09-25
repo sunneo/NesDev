@@ -156,6 +156,7 @@ namespace NesDev.Forms
                 this.scintilla1.KeyPress += scintilla1_KeyPress;
                 this.scintilla1.KeyUp += scintilla1_KeyUp;
                 this.scintilla1.TextChanged += scintilla1_TextChanged;
+                this.scintilla1.Technology = ScintillaNET.Technology.DirectWrite;
                 
             }
             catch (Exception ee)

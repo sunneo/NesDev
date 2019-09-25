@@ -290,10 +290,10 @@ namespace SharpNes
                 {
                     var mem = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, bmp.PixelFormat);
                     var bitmapProperties = new BitmapProperties(new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore));
-                    using (Bitmap gameBitmap = new Bitmap(d2dRenderTarget, new Size2(w, h), bitmapProperties))
+                    using (Bitmap gameBitmap = new Bitmap(d2dRenderTarget, new Size2(bmp.Width, bmp.Height), bitmapProperties))
                     {
                         gameBitmap.CopyFromMemory(mem.Scan0, mem.Stride);
-                        d2dRenderTarget.DrawBitmap(gameBitmap, clientArea, alpha, BitmapInterpolationMode.NearestNeighbor);
+                        d2dRenderTarget.DrawBitmap(gameBitmap, new RawRectangleF(x,y,x+w,y+h), alpha, BitmapInterpolationMode.NearestNeighbor);
                     }
                     bmp.UnlockBits(mem);
                 });
@@ -410,7 +410,7 @@ namespace SharpNes
         }
         public void drawPixel(int x, int y, int color)
         {
-            fillCircle(x, y, 1, color);
+            fillRect(x, y, 1, 1, color);
         }
         public void drawRect(int x, int y, int w, int h, int color, bool dashed = false, int width = 1)
         {
