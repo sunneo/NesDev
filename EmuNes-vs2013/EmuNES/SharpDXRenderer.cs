@@ -475,7 +475,10 @@ namespace SharpNes
         public void fillRoundRect(int x, int y, int w, int h, float radx, float rady, System.Drawing.Brush gdibrush)
         {
             var param = BrushParamFromGDIBrush(gdibrush);
-            BrushParams.Add(param);
+            lock (_drawReqLock)
+            {
+                BrushParams.Add(param);
+            }
             AddDrawRequest((target) =>
             {
                 var brush = param.GetBrush(target);
@@ -628,11 +631,12 @@ namespace SharpNes
             RenderTarget target;
             public override Brush GetBrush(RenderTarget target)
             {
-                if (this.brush != null)
+                if (this.target!= null && target != this.target)
                 {
-                    if (target == this.target)
+                    if (stopCollection != null)
                     {
-                        return this.brush;
+                        stopCollection.Dispose();
+                        stopCollection = null;
                     }
                 }
                 if (stops == null)
@@ -643,11 +647,7 @@ namespace SharpNes
                 {
                     stopCollection = new GradientStopCollection(target, stops, ExtendMode.Clamp);
                 }
-                else
-                {
-                    stopCollection.Dispose();
-                    stopCollection = new GradientStopCollection(target, stops, ExtendMode.Clamp);
-                }
+                
                 this.brush = new LinearGradientBrush(target, prop, stopCollection);
                 this.target = target;
                 return brush;
@@ -713,7 +713,10 @@ namespace SharpNes
         public void fillEllipse(int x, int y, int w, int h, System.Drawing.Brush gdibrush)
         {
             var param = BrushParamFromGDIBrush(gdibrush);
-            BrushParams.Add(param);
+            lock (_drawReqLock)
+            {
+                BrushParams.Add(param);
+            }
             AddDrawRequest((target) =>
             {
                 Brush brush = param.GetBrush(target);
@@ -812,7 +815,10 @@ namespace SharpNes
         public void fillRect(int x, int y, int w, int h, System.Drawing.Brush gdibrush)
         {
             var param = BrushParamFromGDIBrush(gdibrush);
-            BrushParams.Add(param);
+            lock (_drawReqLock)
+            {
+                BrushParams.Add(param);
+            }
             AddDrawRequest((target) =>
             {
                 Brush brush = param.GetBrush(target);
