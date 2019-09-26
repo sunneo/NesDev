@@ -15,8 +15,8 @@ using System.Runtime.InteropServices;
 
 namespace SharpNes
 {
-    
-    public class SharpDXRenderer : Control, IRenderer
+
+    public class SharpDXControl : UserControl, IRenderer
     {
         Device device;
         SwapChain swapChain;
@@ -29,10 +29,14 @@ namespace SharpNes
         public static readonly int MOUSE_LEFT = 0;
         public static readonly int MOUSE_MIDDLE = 1;
         public static readonly int MOUSE_RIGHT = 2;
+        public System.Drawing.Drawing2D.SmoothingMode SmoothMode = System.Drawing.Drawing2D.SmoothingMode.Default;
+        public System.Drawing.Text.TextRenderingHint TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
+        public System.Drawing.Drawing2D.InterpolationMode InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Default;
         bool useAlpha = true;
-        public SharpDXRenderer()
+        public SharpDXControl()
         {
-            this.DoubleBuffered = true;
+            //this.DoubleBuffered = true;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
         }
         public void setUseAlpha(bool buse)
         {
@@ -149,7 +153,7 @@ namespace SharpNes
 
                     Device.CreateWithSwapChain(DriverType.Hardware,
                         DeviceCreationFlags.BgraSupport,
-                        new[] { SharpDX.Direct3D.FeatureLevel.Level_10_0 },
+                        new[] { SharpDX.Direct3D.FeatureLevel.Level_9_3 },
                         desc,
                         out device,
                         out swapChain);
@@ -162,7 +166,7 @@ namespace SharpNes
                     Texture2D backBuffer = Resource.FromSwapChain<Texture2D>(swapChain, 0);
 
                     Surface surface = backBuffer.QueryInterface<Surface>();
-                    
+
                     d2dRenderTarget = new RenderTarget(d2dFactory, surface,
                         new RenderTargetProperties(new PixelFormat(Format.Unknown, AlphaMode.Premultiplied)));
 
@@ -296,6 +300,100 @@ namespace SharpNes
                     target.Clear(coveredColor(color));
                 });
             }
+
+        }
+        public System.Drawing.SizeF MeasureString(String s, System.Drawing.Font font = null, int maxsize = -1)
+        {
+            if (font == null) font = this.Font;
+            using (SharpDX.DirectWrite.TextFormat format = new SharpDX.DirectWrite.TextFormat(FactoryDWrite, font.FontFamily.Name, WeightFromFontStyle(font.Style), StyleFromFontStyle(font.Style), font.Size))
+            {
+                if (maxsize == -1)
+                {
+                    maxsize = this.Width;
+                }
+                using (SharpDX.DirectWrite.TextLayout layout =
+            new SharpDX.DirectWrite.TextLayout(FactoryDWrite, s, format, maxsize, font.Height))
+                {
+                    return new System.Drawing.SizeF(layout.Metrics.Width, layout.Metrics.Height);
+                }
+
+            }
+
+        }
+
+        public void drawRoundRect(int x, int y, int w, int h, float rad, int color, int penWidth = 1)
+        {
+            lock (_drawReqLock)
+            {
+                DrawRequests.Add((target) =>
+                {
+                    using (var brush = GetBrushFromColor(target, color))
+                    {
+                        RoundedRectangle rect = new RoundedRectangle();
+                        rect.Rect = new RawRectangleF(x, y, x + w, y + h);
+                        rect.RadiusX = rad;
+                        rect.RadiusY = rad;
+                        target.DrawRoundedRectangle(rect, brush, penWidth);
+                    }
+                });
+            }
+        }
+        public void fillRoundRect(int x, int y, int w, int h, float radx, float rady, int color)
+        {
+            lock (_drawReqLock)
+            {
+                DrawRequests.Add((target) =>
+                {
+                    using (var brush = GetBrushFromColor(target, color))
+                    {
+                        dxFillRoundRect(target, x, y, w, h, radx, rady, brush);
+                    }
+                });
+            }
+        }
+        public void fillRoundRect(int x, int y, int w, int h, float rad, int color)
+        {
+            fillRoundRect(x, y, w, h, rad, rad, color);
+        }
+        private void dxFillRoundRect(RenderTarget target, int x, int y, int w, int h, float radx, float rady, Brush brush)
+        {
+            RoundedRectangle rect = new RoundedRectangle();
+            rect.Rect = new RawRectangleF(x, y, x + w, y + h);
+            rect.RadiusX = radx;
+            rect.RadiusY = rady;
+            target.FillRoundedRectangle(rect, brush);
+        }
+        public void fillRoundRect(int x, int y, int w, int h, float radx, float rady, System.Drawing.Brush gdibrush)
+        {
+            lock (_drawReqLock)
+            {
+                var brush = BrushFromGDIBrush(this.d2dRenderTarget, gdibrush);
+                DrawRequests.Add((target) =>
+                {
+                    dxFillRoundRect(target, x, y, w, h, radx, rady, brush);
+                    brush.Dispose();
+                });
+            }
+        }
+        public void fillRoundRect(int x, int y, int w, int h, float rad, System.Drawing.Brush gdibrush)
+        {
+            fillRoundRect(x, y, w, h, rad, rad, gdibrush);
+        }
+        public void fillRoundRect(System.Drawing.Rectangle r, float rad, int color)
+        {
+            fillRoundRect(r.X, r.Y, r.Width, r.Height, rad, rad, color);
+        }
+        public void fillRoundRect(System.Drawing.Rectangle r, float rad, System.Drawing.Brush brush)
+        {
+            fillRoundRect(r.X, r.Y, r.Width, r.Height, rad, rad, brush);
+        }
+        public void fillRoundRect(System.Drawing.Point position, System.Drawing.Size size, float rad, int color)
+        {
+            fillRoundRect(position.X, position.Y, size.Width, size.Height, rad, rad, color);
+        }
+        public void fillRoundRect(System.Drawing.Point position, System.Drawing.Size size, float rad, System.Drawing.Brush brush)
+        {
+            fillRoundRect(position.X, position.Y, size.Width, size.Height, rad, rad, brush);
         }
         public void drawImage(System.Drawing.Bitmap bmp, int x, int y, int w, int h, float alpha)
         {
@@ -308,7 +406,7 @@ namespace SharpNes
                     using (Bitmap gameBitmap = new Bitmap(d2dRenderTarget, new Size2(bmp.Width, bmp.Height), bitmapProperties))
                     {
                         gameBitmap.CopyFromMemory(mem.Scan0, mem.Stride);
-                        d2dRenderTarget.DrawBitmap(gameBitmap, new RawRectangleF(x,y,x+w,y+h), alpha, BitmapInterpolationMode.NearestNeighbor);
+                        d2dRenderTarget.DrawBitmap(gameBitmap, new RawRectangleF(x, y, x + w, y + h), alpha, BitmapInterpolationMode.NearestNeighbor);
                     }
                     bmp.UnlockBits(mem);
                 });
@@ -346,23 +444,23 @@ namespace SharpNes
 
             lock (_drawReqLock)
             {
+                if (font == null)
+                {
+                    font = this.Font;
+                }
+                SharpDX.DirectWrite.FontWeight weight = WeightFromFontStyle(font.Style);
+                SharpDX.DirectWrite.FontStyle style = StyleFromFontStyle(font.Style);
+                SharpDX.DirectWrite.TextFormat stringFormat = new SharpDX.DirectWrite.TextFormat(this.FactoryDWrite, font.FontFamily.Name, weight, style, font.Size);
                 this.DrawRequests.Add((target) =>
                 {
-                    if (font == null)
-                    {
-                        font = this.Font;
-                    }
-
                     if (!String.IsNullOrEmpty(str))
                     {
-                        using (Brush brush = GetBrushFromColor(target,color))
+                        using (Brush brush = GetBrushFromColor(target, color))
                         {
-                            SharpDX.DirectWrite.FontWeight weight = WeightFromFontStyle(font.Style);
-                            SharpDX.DirectWrite.FontStyle style = StyleFromFontStyle(font.Style);
-                            SharpDX.DirectWrite.TextFormat stringFormat = new SharpDX.DirectWrite.TextFormat(this.FactoryDWrite, font.FontFamily.Name, weight, style, font.Size);
                             stringFormat.TextAlignment = SharpDX.DirectWrite.TextAlignment.Leading;
                             stringFormat.WordWrapping = SharpDX.DirectWrite.WordWrapping.NoWrap;
                             target.DrawText(str, stringFormat, new RawRectangleF(rect.X, rect.Y, rect.Right, rect.Bottom), brush);
+                            stringFormat.Dispose();
                         }
                     }
                 });
@@ -391,7 +489,7 @@ namespace SharpNes
                 {
                     using (var brush = GetBrushFromColor(target, color))
                     {
-                        Ellipse ell = new Ellipse(new RawVector2(x, y), w, h);
+                        Ellipse ell = new Ellipse(new RawVector2(x + w / 2, y + h / 2), w, h);
                         target.DrawEllipse(ell, brush);
                     }
                 });
@@ -399,14 +497,14 @@ namespace SharpNes
         }
         private Brush BrushFromGDIBrush(RenderTarget target, System.Drawing.Brush brush)
         {
-            
+
             if (brush is System.Drawing.Drawing2D.LinearGradientBrush)
             {
                 System.Drawing.Drawing2D.LinearGradientBrush linear = (System.Drawing.Drawing2D.LinearGradientBrush)brush;
-                LinearGradientBrushProperties prop =new LinearGradientBrushProperties();
+                LinearGradientBrushProperties prop = new LinearGradientBrushProperties();
                 prop.StartPoint = new RawVector2(linear.Rectangle.Left, linear.Rectangle.Top);
                 prop.EndPoint = new RawVector2(linear.Rectangle.Right, linear.Rectangle.Bottom);
-                
+
                 GradientStop[] stops = null;
                 stops = new GradientStop[linear.InterpolationColors.Colors.Length];
                 for (int i = 0; i < stops.Length; ++i)
@@ -434,36 +532,35 @@ namespace SharpNes
             {
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = GetBrushFromColor(target,color))
+                    using (var brush = GetBrushFromColor(target, color))
                     {
                         dxFillEllipse(target, x, y, w, h, brush);
                     }
                 });
             }
-            
+
         }
         public void fillEllipse(int x, int y, int w, int h, System.Drawing.Brush gdibrush)
         {
             lock (_drawReqLock)
             {
+                Brush brush = BrushFromGDIBrush(this.d2dRenderTarget, gdibrush);
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = BrushFromGDIBrush(target,gdibrush))
-                    {
-                        dxFillEllipse(target, x, y, w, h, brush);
-                    }
+                    dxFillEllipse(target, x, y, w, h, brush);
+                    brush.Dispose();
                 });
             }
         }
         private void dxFillEllipse(SharpDX.Direct2D1.RenderTarget target, int x, int y, int w, int h, Brush brush)
         {
-            Ellipse ell = new Ellipse(new RawVector2(x, y), w, h);
+            Ellipse ell = new Ellipse(new RawVector2(x + w / 2, y + h / 2), w, h);
             target.FillEllipse(ell, brush);
         }
         public void drawCircle(int n_cx, int n_cy, int radius, int pixel)
         {
             int halfRadius = radius / 2;
-            drawEllipse(n_cx - halfRadius, n_cy - halfRadius, radius, radius, pixel);
+            drawEllipse(n_cx - halfRadius, n_cy - halfRadius, radius / 2, radius / 2, pixel);
         }
         public void fillCircle(int n_cx, int n_cy, int radius, int pixel)
         {
@@ -497,7 +594,7 @@ namespace SharpNes
             {
                 DrawRequests.Add((target) =>
                 {
-                    using (Brush brush = GetBrushFromColor(target,color))
+                    using (Brush brush = GetBrushFromColor(target, color))
                     {
                         if (dashed)
                         {
@@ -517,7 +614,7 @@ namespace SharpNes
             {
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = GetBrushFromColor(target,color))
+                    using (var brush = GetBrushFromColor(target, color))
                     {
                         dxFillRect(target, x, y, w, h, brush);
                     }
@@ -544,16 +641,15 @@ namespace SharpNes
         {
             fillRect(position.X, position.Y, size.Width, size.Height, gdibrush);
         }
-        public void fillRect(int x,int y,int w,int h, System.Drawing.Brush gdibrush)
+        public void fillRect(int x, int y, int w, int h, System.Drawing.Brush gdibrush)
         {
             lock (_drawReqLock)
             {
+                Brush brush = BrushFromGDIBrush(d2dRenderTarget, gdibrush);
                 DrawRequests.Add((target) =>
                 {
-                    using (var brush = BrushFromGDIBrush(target,gdibrush))
-                    {
-                        dxFillRect(target, x, y, w, h, brush);
-                    }
+                    dxFillRect(target, x, y, w, h, brush);
+                    brush.Dispose();
                 });
             }
         }
@@ -587,17 +683,17 @@ namespace SharpNes
         }
         public void flush()
         {
-            
+
             this.Invalidate();
         }
         protected override void OnPaint(PaintEventArgs e)
         {
-           
+
             //base.OnPaint(e);
             Draw();
-            
+
             e.Graphics.Flush();
         }
-        
+
     }
 }

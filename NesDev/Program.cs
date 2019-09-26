@@ -16,7 +16,7 @@ namespace NesDev
             System.Windows.Forms.Timer timer;
             SharpNes.IRenderer sdlmmControl1;
             SharpNes.IRenderer[] renderers = new SharpNes.IRenderer[]{
-                 new SharpNes.SharpDXRenderer(),
+                 new SharpNes.SharpDXControl(),
                  new SharpNes.SDLMMControl()
             };
             int rendererIdx = 0;
@@ -484,7 +484,7 @@ namespace NesDev
             }
             Utility.Expander = new ExpanderImplement();
             Program.mainform = new MainForm();
-            Application.Run(Program.mainform);
+            Application.Run(new NBody());
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

@@ -148,7 +148,7 @@
     <Compile Include="Settings\ZapperSettings.cs" />
     <Compile Include="Settings\JoypadSettings.cs" />
     <Compile Include="SharpDXRenderer.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ToolStripStatusHistoryLabel.cs">
       <SubType>Component</SubType>
