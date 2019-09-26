@@ -36,7 +36,28 @@ namespace SharpNes
         bool useAlpha = true;
         public SharpDXControl()
         {
-            //this.DoubleBuffered = true;
+            ///this.DoubleBuffered = true;
+        }
+        protected override void OnInvalidated(InvalidateEventArgs e)
+        {
+            base.OnInvalidated(e);
+            bool redraw = false;
+            lock (_drawLock)
+            {
+                if (DrawRequestFlushed)
+                {
+                    this.swapChain.Present(0, PresentFlags.DoNotWait);
+                }
+                else
+                {
+                    redraw = true;
+                }
+            }
+            if (redraw)
+            {
+                this.Draw();
+            }
+
         }
         public void setUseAlpha(bool buse)
         {
@@ -131,7 +152,7 @@ namespace SharpNes
                 return d2dRenderTarget != null;
             }
         }
-        public class DXGI2DContext:IDisposable
+        public class DXGI2DContext : IDisposable
         {
             int width;
             int height;
@@ -179,7 +200,7 @@ namespace SharpNes
                 {
                     wicBitmap.Dispose();
                     wicBitmap = null;
-                } 
+                }
                 if (d2dFactory != null)
                 {
                     d2dFactory.Dispose();
@@ -198,11 +219,11 @@ namespace SharpNes
             private void InitDXGIRendering()
             {
 
-               
+
             }
             public System.Drawing.Bitmap FlushToBitmap()
             {
-                byte[] bits =new byte[width * height * 4];
+                byte[] bits = new byte[width * height * 4];
                 memStream = new System.IO.MemoryStream(bits);
                 var stream = new SharpDX.WIC.WICStream(wicFactory, memStream);
                 // Initialize a Jpeg encoder with this stream
@@ -226,7 +247,7 @@ namespace SharpNes
                 return (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream(memStream);
             }
         }
-        
+
         public void InitRendering()
         {
             try
@@ -244,7 +265,7 @@ namespace SharpNes
                         OutputHandle = Handle,
                         SampleDescription = new SampleDescription(1, 0),
                         SwapEffect = SwapEffect.Discard,
-                        Usage = Usage.RenderTargetOutput| Usage.Shared
+                        Usage = Usage.RenderTargetOutput | Usage.Shared
                     };
 
                     Device.CreateWithSwapChain(DriverType.Hardware,
@@ -262,11 +283,11 @@ namespace SharpNes
                     Texture2D backBuffer = Resource.FromSwapChain<Texture2D>(swapChain, 0);
 
                     surface = backBuffer.QueryInterface<Surface>();
-                    
+
                     d2dRenderTarget = new SharpDX.Direct2D1.RenderTarget(d2dFactory, surface,
                         new RenderTargetProperties(new PixelFormat(Format.Unknown, AlphaMode.Premultiplied)));
-                    
-                    
+
+
                     var bitmapProperties = new BitmapProperties(new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore));
 
                     clientArea = new RawRectangleF
@@ -376,7 +397,7 @@ namespace SharpNes
                 }
                 this.d2dRenderTarget.Flush();
                 d2dRenderTarget.EndDraw();
-                swapChain.Present(0, PresentFlags.None);
+              
             }
         }
 
@@ -404,7 +425,7 @@ namespace SharpNes
                     }
                     BrushParams.Clear();
                 }
-              
+
                 DrawRequests.Add(action);
             }
         }
@@ -422,17 +443,18 @@ namespace SharpNes
             if (font == null) font = this.Font;
             using (SharpDX.DirectWrite.TextFormat format = new SharpDX.DirectWrite.TextFormat(FactoryDWrite, font.FontFamily.Name, WeightFromFontStyle(font.Style), StyleFromFontStyle(font.Style), font.Size))
             {
-                if(maxsize == -1){
+                if (maxsize == -1)
+                {
                     maxsize = this.Width;
                 }
                 using (SharpDX.DirectWrite.TextLayout layout =
-            new SharpDX.DirectWrite.TextLayout(FactoryDWrite, s, format,maxsize, font.Height))
+            new SharpDX.DirectWrite.TextLayout(FactoryDWrite, s, format, maxsize, font.Height))
                 {
                     return new System.Drawing.SizeF(layout.Metrics.Width, layout.Metrics.Height);
                 }
-                
+
             }
-            
+
         }
 
         public void drawRoundRect(int x, int y, int w, int h, float rad, int color, int penWidth = 1)
@@ -445,7 +467,7 @@ namespace SharpNes
                     rect.Rect = new RawRectangleF(x, y, x + w, y + h);
                     rect.RadiusX = rad;
                     rect.RadiusY = rad;
-                    target.DrawRoundedRectangle(rect,brush, penWidth);
+                    target.DrawRoundedRectangle(rect, brush, penWidth);
                 }
             });
         }
@@ -458,7 +480,7 @@ namespace SharpNes
                     dxFillRoundRect(target, x, y, w, h, radx, rady, brush);
                 }
             });
-            
+
         }
         public void fillRoundRect(int x, int y, int w, int h, float rad, int color)
         {
@@ -560,7 +582,7 @@ namespace SharpNes
             {
                 font = this.Font;
             }
-           
+
             AddDrawRequest((target) =>
             {
                 if (!String.IsNullOrEmpty(str))
@@ -601,7 +623,7 @@ namespace SharpNes
                 }
             });
         }
-        public class BrushParam:IDisposable
+        public class BrushParam : IDisposable
         {
             public SharpDXControl Parent;
             public virtual Brush GetBrush(RenderTarget target)
@@ -611,10 +633,10 @@ namespace SharpNes
 
             public virtual void Dispose()
             {
-               
+
             }
         }
-        public class SolidBrushParam:BrushParam
+        public class SolidBrushParam : BrushParam
         {
             public int Color;
             public override Brush GetBrush(RenderTarget target)
@@ -622,7 +644,7 @@ namespace SharpNes
                 return Parent.GetBrushFromColor(target, Color);
             }
         }
-        public class LinearGradientBrushParam:BrushParam
+        public class LinearGradientBrushParam : BrushParam
         {
             public LinearGradientBrushProperties prop = new LinearGradientBrushProperties();
             public GradientStop[] stops = null;
@@ -631,7 +653,7 @@ namespace SharpNes
             RenderTarget target;
             public override Brush GetBrush(RenderTarget target)
             {
-                if (this.target!= null && target != this.target)
+                if (this.target != null && target != this.target)
                 {
                     if (stopCollection != null)
                     {
@@ -647,7 +669,7 @@ namespace SharpNes
                 {
                     stopCollection = new GradientStopCollection(target, stops, ExtendMode.Clamp);
                 }
-                
+
                 this.brush = new LinearGradientBrush(target, prop, stopCollection);
                 this.target = target;
                 return brush;
@@ -655,7 +677,7 @@ namespace SharpNes
             public override void Dispose()
             {
                 base.Dispose();
-               
+
                 if (stopCollection != null)
                 {
                     stops = null;
@@ -665,7 +687,7 @@ namespace SharpNes
             }
         }
         public List<BrushParam> BrushParams = new List<BrushParam>();
-        private BrushParam BrushParamFromGDIBrush( System.Drawing.Brush brush)
+        private BrushParam BrushParamFromGDIBrush(System.Drawing.Brush brush)
         {
             if (brush is System.Drawing.Drawing2D.LinearGradientBrush)
             {
@@ -680,7 +702,7 @@ namespace SharpNes
                     parm.stops[i].Color = ToRawColor4(linear.InterpolationColors.Colors[i]);
                     parm.stops[i].Position = linear.InterpolationColors.Positions[i];
                 }
-                
+
                 parm.Parent = this;
                 return parm;
             }
@@ -689,7 +711,7 @@ namespace SharpNes
                 System.Drawing.SolidBrush solid = (System.Drawing.SolidBrush)brush;
                 SolidBrushParam solidParm = new SolidBrushParam();
                 solidParm.Parent = this;
-                solidParm.Color =  solid.Color.ToArgb();
+                solidParm.Color = solid.Color.ToArgb();
                 return solidParm;
             }
             else
@@ -729,17 +751,17 @@ namespace SharpNes
         }
         private void dxFillEllipse(SharpDX.Direct2D1.RenderTarget target, int x, int y, int w, int h, Brush brush)
         {
-            Ellipse ell = new Ellipse(new RawVector2(x+w/2, y+h/2), w, h);
+            Ellipse ell = new Ellipse(new RawVector2(x + w / 2, y + h / 2), w, h);
             target.FillEllipse(ell, brush);
         }
         public void drawCircle(int n_cx, int n_cy, int radius, int pixel)
         {
             int halfRadius = radius / 2;
-            drawEllipse(n_cx - halfRadius, n_cy - halfRadius, radius/2, radius/2, pixel);
+            drawEllipse(n_cx - halfRadius, n_cy - halfRadius, radius / 2, radius / 2, pixel);
         }
         public void fillCircle(int n_cx, int n_cy, int radius, int pixel)
         {
-            int halfRadius = radius/2;
+            int halfRadius = radius / 2;
             fillEllipse(n_cx - halfRadius, n_cy - halfRadius, radius, radius, pixel);
         }
         public void fillCircle(int n_cx, int n_cy, int radius, System.Drawing.Brush gdibrush)
@@ -842,7 +864,7 @@ namespace SharpNes
                 gameBitmap.CopyFromMemory(pixels, w * 4);
                 d2dRenderTarget.DrawBitmap(gameBitmap, clientArea, 1.0f, BitmapInterpolationMode.NearestNeighbor);
             }
-            
+
         }
         public System.Drawing.Bitmap flushToBMP()
         {
@@ -864,17 +886,33 @@ namespace SharpNes
         }
         public void flush()
         {
-            
             this.Invalidate();
         }
         protected override void OnPaint(PaintEventArgs e)
         {
-           
-            //base.OnPaint(e);
-            Draw();
-            
-            e.Graphics.Flush();
+            base.OnPaint(e);
+            bool redraw = false;
+            lock (_drawLock)
+            {
+                if (this.DrawRequestFlushed)
+                {
+                    swapChain.Present(0, PresentFlags.None);
+
+                }
+                else
+                {
+                    redraw = true;
+                }
+            }
+            if (redraw)
+            {
+                Draw();
+            }
         }
-        
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            base.OnPaintBackground(e);
+
+        }
     }
 }
