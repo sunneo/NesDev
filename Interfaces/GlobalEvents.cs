@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace NesDev
+namespace Interfaces
 {
     public class GlobalEvents
     {
@@ -21,7 +21,7 @@ namespace NesDev
         }
         public static event EventHandler SearchBoxRequired;
         public static event EventHandler ReplaceBoxRequired;
-        public static event EventHandler<Interfaces.ICustomizeCommand> CommandLaunchOccurred;
+        public static event EventHandler<ICustomizeCommand> CommandLaunchOccurred;
         public static event EventHandler<SaveFileRequestEventArgs> SaveFileOccurred;
         public static event EventHandler<SaveFileRequestEventArgs> CloseFileOccurred;
         public static event EventHandler<Exception> ExceptionOccurred;
@@ -53,7 +53,7 @@ namespace NesDev
                 GlobalEvents.NotifyException(sender, ee);
             }
         }
-        public static void NotifyLaunchCommand(object sender, Interfaces.ICustomizeCommand cmd)
+        public static void NotifyLaunchCommand(object sender, ICustomizeCommand cmd)
         {
             try
             {

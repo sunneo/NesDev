@@ -1,7 +1,8 @@
-﻿using Jint.Native;
+﻿using Interfaces;
+using Jint.Native;
 using NesDev.Dialogs;
 using NesDev.Forms;
-using NesDev.Interfaces;
+using Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using Serializers;
 
 namespace NesDev
 {

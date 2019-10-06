@@ -1,5 +1,5 @@
-﻿using NesDev.Forms.DocWidgets;
-using NesDev.Interfaces;
+﻿using Interfaces;
+using NesDev.Forms.DocWidgets;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

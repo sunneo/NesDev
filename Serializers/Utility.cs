@@ -1,4 +1,4 @@
-﻿using NesDev.Interfaces;
+﻿using Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NesDev
+namespace Serializers
 {
     public class Utility
     {

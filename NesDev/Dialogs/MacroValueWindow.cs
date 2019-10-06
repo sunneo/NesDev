@@ -7,7 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using Interfaces;
+using Serializers;
 namespace NesDev.Dialogs
 {
     public partial class MacroValueWindow : Form
