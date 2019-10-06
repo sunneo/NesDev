@@ -35,9 +35,9 @@ namespace JSONRPC
         {
             if (!IsConnected) return false;
             String sendData = Utility.SerializeToString(arg, typeof(RPCPackage<Targ, Tresult>));
-            Writer.Write(sendData);
+            Writer.WriteLine(sendData);
             Writer.Flush();
-            String retstr = Reader.ReadToEnd();
+            String retstr = Reader.ReadLine();
             if(String.IsNullOrEmpty(retstr)) return false;
             RPCPackage<Targ, Tresult> ret = Utility.DeserializeString<RPCPackage<Targ, Tresult>>(retstr);
             if (ret == null)

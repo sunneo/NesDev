@@ -38,6 +38,7 @@ namespace Interfaces
 
     public interface IBaseRPCPackage
     {
+        String RawString { get; set; }
         String method { get; set; }
         ValueType Params { get; set; }
         ValueType Results { get; set; }
@@ -47,6 +48,7 @@ namespace Interfaces
         where ParamType : ValueType
         where ResultType: ValueType
     {
+        public String RawString { get; set; }
         public String method { get; set; }
         public ParamType Params { get; set; }
         public ResultType Results { get; set; }

@@ -1,4 +1,5 @@
 ﻿using Interfaces;
+using Serializers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,24 +13,57 @@ namespace JSONRPC
     {
         TextReader Reader;
         TextWriter Writer;
+        
         internal JsonRPCServer(TextReader reader, TextWriter writer)
         {
             this.Reader = reader;
             this.Writer = writer;
         }
+        Dictionary<String, Action<IBaseRPCPackage>> Handlers = new Dictionary<string, Action<IBaseRPCPackage>>();
         public void RegisterHandler(string FunctionName, Action<IBaseRPCPackage> pkg)
         {
-            throw new NotImplementedException();
+            Handlers[FunctionName] = pkg;
         }
 
-        public void Start()
+        public virtual void Start()
         {
-            throw new NotImplementedException();
+            while (true)
+            {
+                String txt = Reader.ReadLine();
+                if (!String.IsNullOrEmpty(txt))
+                {
+                    try
+                    {
+                        RPCPackage<StringValue, StringValue> header = Utility.DeserializeString<RPCPackage<StringValue, StringValue>>(txt);
+                        if (header != null)
+                        {
+                            header.RawString = txt;
+                            if (Handlers.ContainsKey(header.method))
+                            {
+                                Handlers[header.method](header);
+                                header.Params = null;
+                                header.RawString = null;
+                                String response = Utility.SerializeToString(header);
+                                Writer.WriteLine(response);
+                                Writer.Flush();
+                            }
+                            else
+                            {
+                                Console.Error.WriteLine("Not Found Function Handler for {0}",header.method);
+                            }
+                        }
+                    }
+                    catch(Exception ee)
+                    {
+                        Console.Error.WriteLine(ee.ToString());
+                    }
+                }
+            }
         }
 
         public void Stop()
         {
-            throw new NotImplementedException();
+            Reader.Close();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using NesDev.Config;
+using Serializers;
 using System;
 using System.Collections.Generic;
 using System.IO;

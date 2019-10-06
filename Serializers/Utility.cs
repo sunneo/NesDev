@@ -50,6 +50,7 @@ namespace Serializers
                 using (Newtonsoft.Json.JsonTextWriter writer = new Newtonsoft.Json.JsonTextWriter(w))
                 {
                     Newtonsoft.Json.JsonSerializer s = new Newtonsoft.Json.JsonSerializer();
+                    s.Formatting = Newtonsoft.Json.Formatting.None;
                     if (t == null)
                     {
                         t = o.GetType();
