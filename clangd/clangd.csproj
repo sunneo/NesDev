@@ -57,6 +57,20 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Interfaces\Interfaces.csproj">
+      <Project>{ca414482-f657-4cf6-92c1-340bd9d993a3}</Project>
+      <Name>Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JSONRPC\JSONRPC.csproj">
+      <Project>{b729afa6-5fc7-4df9-aef0-253193925f58}</Project>
+      <Name>JSONRPC</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serializers\Serializers.csproj">
+      <Project>{ec252859-d160-490e-b950-82e85776e68b}</Project>
+      <Name>Serializers</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\clang.sharp.3.6.2\build\net40\clang.sharp.targets" Condition="Exists('..\packages\clang.sharp.3.6.2\build\net40\clang.sharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
