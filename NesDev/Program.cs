@@ -485,7 +485,7 @@ namespace NesDev
             }
             Utility.Expander = new ExpanderImplement();
             Program.mainform = new MainForm();
-            Application.Run(new NBody());
+            Application.Run(mainform);
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
