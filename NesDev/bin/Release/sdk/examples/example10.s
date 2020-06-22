@@ -11,34 +11,43 @@
 	.macpack	longbranch
 	.forceimport	__STARTUP__
 	.import		_pal_bg
-	.import		_pal_spr
+	.import		_pal_col
 	.import		_ppu_wait_nmi
 	.import		_ppu_on_all
 	.import		_oam_spr
 	.import		_pad_poll
 	.import		_scroll
-	.import		_rand8
 	.import		_set_vram_update
 	.import		_flush_vram_update
 	.import		_delay
+	.export		_palette
 	.export		_metatiles
 	.export		_metaattrs
-	.export		_palBackground
-	.export		_palSprites
 	.export		_level_data
 	.export		_prepare_row_update
 	.export		_preload_screen
 	.export		_get_metatile
-	.export		_balls_init
-	.export		_balls_update
 	.export		_main
-
-.segment	"DATA"
-
-.segment	"ZEROPAGE"
 
 .segment	"RODATA"
 
+_palette:
+	.byte	$0F
+	.byte	$16
+	.byte	$26
+	.byte	$36
+	.byte	$0F
+	.byte	$18
+	.byte	$28
+	.byte	$38
+	.byte	$0F
+	.byte	$19
+	.byte	$29
+	.byte	$39
+	.byte	$0F
+	.byte	$1C
+	.byte	$2C
+	.byte	$3C
 _metatiles:
 	.byte	$00
 	.byte	$00
@@ -66,40 +75,6 @@ _metaattrs:
 	.byte	$55
 	.byte	$AA
 	.byte	$FF
-_palBackground:
-	.byte	$0F
-	.byte	$16
-	.byte	$26
-	.byte	$36
-	.byte	$0F
-	.byte	$18
-	.byte	$28
-	.byte	$38
-	.byte	$0F
-	.byte	$19
-	.byte	$29
-	.byte	$39
-	.byte	$0F
-	.byte	$1C
-	.byte	$2C
-	.byte	$3C
-_palSprites:
-	.byte	$0F
-	.byte	$17
-	.byte	$27
-	.byte	$37
-	.byte	$0F
-	.byte	$11
-	.byte	$21
-	.byte	$31
-	.byte	$0F
-	.byte	$15
-	.byte	$25
-	.byte	$35
-	.byte	$0F
-	.byte	$19
-	.byte	$29
-	.byte	$39
 _level_data:
 	.byte	$03
 	.byte	$04
@@ -1386,47 +1361,6 @@ _level_data:
 
 _update_list:
 	.res	47,$00
-_ball_x:
-	.res	63,$00
-_ball_y:
-	.res	63,$00
-_ball_dx:
-	.res	63,$00
-_ball_dy:
-	.res	63,$00
-.segment	"ZEROPAGE"
-_col:
-	.res	1,$00
-_tile:
-	.res	1,$00
-_attr:
-	.res	1,$00
-_tile_off:
-	.res	1,$00
-_updn_off:
-	.res	1,$00
-_upda_off:
-	.res	1,$00
-_mask1:
-	.res	1,$00
-_mask2:
-	.res	1,$00
-_mask3:
-	.res	1,$00
-_mask4:
-	.res	1,$00
-_i:
-	.res	1,$00
-_j:
-	.res	1,$00
-_spr:
-	.res	1,$00
-_name_adr:
-	.res	2,$00
-_attr_adr:
-	.res	2,$00
-_src:
-	.res	2,$00
 
 ; ---------------------------------------------------------------
 ; void __near__ prepare_row_update (unsigned char, unsigned int)
@@ -1436,6 +1370,35 @@ _src:
 
 .proc	_prepare_row_update: near
 
+.segment	"BSS"
+
+L052E:
+	.res	1,$00
+L052F:
+	.res	1,$00
+L0530:
+	.res	1,$00
+L0531:
+	.res	1,$00
+L0532:
+	.res	1,$00
+L0533:
+	.res	1,$00
+L0534:
+	.res	1,$00
+L0535:
+	.res	1,$00
+L0536:
+	.res	1,$00
+L0537:
+	.res	1,$00
+L0538:
+	.res	2,$00
+L0539:
+	.res	2,$00
+L053A:
+	.res	2,$00
+
 .segment	"CODE"
 
 	ldy     #$02
@@ -1443,7 +1406,7 @@ _src:
 	lda     (sp),y
 	cmp     #$1E
 	jsr     boolult
-	jeq     L0543
+	jeq     L053B
 	ldy     #$02
 	ldx     #$00
 	lda     (sp),y
@@ -1453,8 +1416,8 @@ _src:
 	ldx     #$20
 	lda     #$00
 	jsr     tosaddax
-	sta     _name_adr
-	stx     _name_adr+1
+	sta     L0538
+	stx     L0538+1
 	ldy     #$02
 	ldx     #$00
 	lda     (sp),y
@@ -1464,10 +1427,10 @@ _src:
 	ldx     #$23
 	lda     #$C0
 	jsr     tosaddax
-	sta     _attr_adr
-	stx     _attr_adr+1
-	jmp     L054C
-L0543:	ldy     #$02
+	sta     L0539
+	stx     L0539+1
+	jmp     L0544
+L053B:	ldy     #$02
 	ldx     #$00
 	lda     (sp),y
 	sec
@@ -1482,8 +1445,8 @@ L0543:	ldy     #$02
 	ldx     #$28
 	lda     #$00
 	jsr     tosaddax
-	sta     _name_adr
-	stx     _name_adr+1
+	sta     L0538
+	stx     L0538+1
 	ldy     #$02
 	ldx     #$00
 	lda     (sp),y
@@ -1493,30 +1456,30 @@ L0543:	ldy     #$02
 	ldx     #$2B
 	lda     #$C0
 	jsr     tosaddax
-	sta     _attr_adr
-	stx     _attr_adr+1
-L054C:	ldx     #$00
-	lda     _name_adr+1
+	sta     L0539
+	stx     L0539+1
+L0544:	ldx     #$00
+	lda     L0538+1
 	ora     #$40
 	sta     _update_list
-	lda     _name_adr
-	ldx     _name_adr+1
+	lda     L0538
+	ldx     L0538+1
 	ldx     #$00
 	sta     _update_list+1
 	ldx     #$00
-	lda     _attr_adr+1
+	lda     L0539+1
 	ora     #$40
 	sta     _update_list+35
-	lda     _attr_adr
-	ldx     _attr_adr+1
+	lda     L0539
+	ldx     L0539+1
 	ldx     #$00
 	sta     _update_list+36
 	ldx     #$00
 	lda     #$03
-	sta     _updn_off
+	sta     L0532
 	ldx     #$00
 	lda     #$26
-	sta     _upda_off
+	sta     L0533
 	ldy     #$01
 	jsr     ldaxysp
 	jsr     shlax4
@@ -1527,112 +1490,112 @@ L054C:	ldx     #$00
 	adc     #>(_level_data)
 	tax
 	tya
-	sta     _src
-	stx     _src+1
+	sta     L053A
+	stx     L053A+1
 	ldy     #$02
 	ldx     #$00
 	lda     (sp),y
 	ldx     #$00
 	and     #$01
 	jsr     bnegax
-	jeq     L0575
+	jeq     L056D
 	ldx     #$00
 	lda     #$00
-	sta     _tile_off
-	jmp     L057A
-L0575:	ldx     #$00
+	sta     L0531
+	jmp     L0572
+L056D:	ldx     #$00
 	lda     #$02
-	sta     _tile_off
-L057A:	ldy     #$02
+	sta     L0531
+L0572:	ldy     #$02
 	ldx     #$00
 	lda     (sp),y
 	ldx     #$00
 	and     #$02
 	jsr     bnegax
-	jeq     L057D
+	jeq     L0575
 	ldx     #$00
 	lda     #$FC
-	sta     _mask1
+	sta     L0534
 	ldx     #$00
 	lda     #$03
-	sta     _mask2
+	sta     L0535
 	ldx     #$00
 	lda     #$F3
-	sta     _mask3
+	sta     L0536
 	ldx     #$00
 	lda     #$0C
-	sta     _mask4
-	jmp     L0588
-L057D:	ldx     #$00
+	sta     L0537
+	jmp     L0580
+L0575:	ldx     #$00
 	lda     #$CF
-	sta     _mask1
+	sta     L0534
 	ldx     #$00
 	lda     #$30
-	sta     _mask2
+	sta     L0535
 	ldx     #$00
 	lda     #$3F
-	sta     _mask3
+	sta     L0536
 	ldx     #$00
 	lda     #$C0
-	sta     _mask4
-L0588:	ldx     #$00
+	sta     L0537
+L0580:	ldx     #$00
 	lda     #$00
-	sta     _col
-L0591:	ldx     #$00
-	lda     _col
+	sta     L052E
+L0589:	ldx     #$00
+	lda     L052E
 	cmp     #$08
 	jsr     boolult
-	jne     L0594
-	jmp     L0592
-L0594:	lda     _src
-	ldx     _src+1
+	jne     L058C
+	jmp     L058A
+L058C:	lda     L053A
+	ldx     L053A+1
 	sta     regsave
 	stx     regsave+1
 	jsr     incax1
-	sta     _src
-	stx     _src+1
+	sta     L053A
+	stx     L053A+1
 	lda     regsave
 	ldx     regsave+1
 	ldy     #$00
 	jsr     ldauidx
-	sta     _tile
+	sta     L052F
 	lda     #<(_update_list)
 	ldx     #>(_update_list)
 	clc
-	adc     _upda_off
-	bcc     L059F
+	adc     L0533
+	bcc     L0597
 	inx
-L059F:	ldy     #$00
+L0597:	ldy     #$00
 	jsr     ldauidx
 	jsr     pushax
 	ldx     #$00
-	lda     _mask1
+	lda     L0534
 	jsr     tosandax
 	jsr     pushax
 	lda     #<(_metaattrs)
 	ldx     #>(_metaattrs)
 	clc
-	adc     _tile
-	bcc     L05A2
+	adc     L052F
+	bcc     L059A
 	inx
-L05A2:	ldy     #$00
+L059A:	ldy     #$00
 	jsr     ldauidx
 	jsr     pushax
 	ldx     #$00
-	lda     _mask2
+	lda     L0535
 	jsr     tosandax
 	jsr     tosorax
-	sta     _attr
+	sta     L0530
 	ldx     #$00
-	lda     _tile
+	lda     L052F
 	jsr     aslax2
 	jsr     pushax
 	ldx     #$00
-	lda     _tile_off
+	lda     L0531
 	jsr     tosaddax
-	sta     _tile
+	sta     L052F
 	ldx     #$00
-	lda     _updn_off
+	lda     L0532
 	clc
 	adc     #<(_update_list)
 	tay
@@ -1642,7 +1605,7 @@ L05A2:	ldy     #$00
 	tya
 	jsr     pushax
 	ldx     #$00
-	lda     _tile
+	lda     L052F
 	clc
 	adc     #<(_metatiles)
 	tay
@@ -1655,7 +1618,7 @@ L05A2:	ldy     #$00
 	ldy     #$00
 	jsr     staspidx
 	ldx     #$00
-	lda     _updn_off
+	lda     L0532
 	jsr     incax1
 	clc
 	adc     #<(_update_list)
@@ -1666,7 +1629,7 @@ L05A2:	ldy     #$00
 	tya
 	jsr     pushax
 	ldx     #$00
-	lda     _tile
+	lda     L052F
 	jsr     incax1
 	clc
 	adc     #<(_metatiles)
@@ -1679,24 +1642,24 @@ L05A2:	ldy     #$00
 	jsr     ldauidx
 	ldy     #$00
 	jsr     staspidx
-	lda     _src
-	ldx     _src+1
+	lda     L053A
+	ldx     L053A+1
 	sta     regsave
 	stx     regsave+1
 	jsr     incax1
-	sta     _src
-	stx     _src+1
+	sta     L053A
+	stx     L053A+1
 	lda     regsave
 	ldx     regsave+1
 	ldy     #$00
 	jsr     ldauidx
-	sta     _tile
+	sta     L052F
 	ldx     #$00
-	lda     _upda_off
+	lda     L0533
 	pha
 	clc
 	adc     #$01
-	sta     _upda_off
+	sta     L0533
 	pla
 	clc
 	adc     #<(_update_list)
@@ -1707,37 +1670,37 @@ L05A2:	ldy     #$00
 	tya
 	jsr     pushax
 	ldx     #$00
-	lda     _attr
+	lda     L0530
 	jsr     pushax
 	ldx     #$00
-	lda     _mask3
+	lda     L0536
 	jsr     tosandax
 	jsr     pushax
 	lda     #<(_metaattrs)
 	ldx     #>(_metaattrs)
 	clc
-	adc     _tile
-	bcc     L05B6
+	adc     L052F
+	bcc     L05AE
 	inx
-L05B6:	ldy     #$00
+L05AE:	ldy     #$00
 	jsr     ldauidx
 	jsr     pushax
 	ldx     #$00
-	lda     _mask4
+	lda     L0537
 	jsr     tosandax
 	jsr     tosorax
 	ldy     #$00
 	jsr     staspidx
 	ldx     #$00
-	lda     _tile
+	lda     L052F
 	jsr     aslax2
 	jsr     pushax
 	ldx     #$00
-	lda     _tile_off
+	lda     L0531
 	jsr     tosaddax
-	sta     _tile
+	sta     L052F
 	ldx     #$00
-	lda     _updn_off
+	lda     L0532
 	jsr     incax2
 	clc
 	adc     #<(_update_list)
@@ -1748,7 +1711,7 @@ L05B6:	ldy     #$00
 	tya
 	jsr     pushax
 	ldx     #$00
-	lda     _tile
+	lda     L052F
 	clc
 	adc     #<(_metatiles)
 	tay
@@ -1761,7 +1724,7 @@ L05B6:	ldy     #$00
 	ldy     #$00
 	jsr     staspidx
 	ldx     #$00
-	lda     _updn_off
+	lda     L0532
 	jsr     incax3
 	clc
 	adc     #<(_update_list)
@@ -1772,7 +1735,7 @@ L05B6:	ldy     #$00
 	tya
 	jsr     pushax
 	ldx     #$00
-	lda     _tile
+	lda     L052F
 	jsr     incax1
 	clc
 	adc     #<(_metatiles)
@@ -1788,13 +1751,13 @@ L05B6:	ldy     #$00
 	ldx     #$00
 	lda     #$04
 	clc
-	adc     _updn_off
-	sta     _updn_off
+	adc     L0532
+	sta     L0532
 	ldx     #$00
-	inc     _col
-	lda     _col
-	jmp     L0591
-L0592:	jsr     incsp3
+	inc     L052E
+	lda     L052E
+	jmp     L0589
+L058A:	jsr     incsp3
 	rts
 
 .endproc
@@ -1807,27 +1770,27 @@ L0592:	jsr     incsp3
 
 .proc	_preload_screen: near
 
-.segment	"ZEROPAGE"
+.segment	"BSS"
 
-L05C5:
+L05BD:
 	.res	1,$00
 
 .segment	"CODE"
 
 	ldx     #$00
 	lda     #$00
-	sta     L05C5
-L05C6:	ldx     #$00
-	lda     L05C5
+	sta     L05BD
+L05BE:	ldx     #$00
+	lda     L05BD
 	cmp     #$1E
 	jsr     boolult
-	jne     L05C9
-	jmp     L05C7
-L05C9:	ldx     #$00
+	jne     L05C1
+	jmp     L05BF
+L05C1:	ldx     #$00
 	lda     #$1D
 	jsr     pushax
 	ldx     #$00
-	lda     L05C5
+	lda     L05BD
 	jsr     tossubax
 	jsr     pusha
 	ldy     #$02
@@ -1843,10 +1806,10 @@ L05C9:	ldx     #$00
 	lda     #$08
 	jsr     addeqysp
 	ldx     #$00
-	inc     L05C5
-	lda     L05C5
-	jmp     L05C6
-L05C7:	jsr     incsp2
+	inc     L05BD
+	lda     L05BD
+	jmp     L05BE
+L05BF:	jsr     incsp2
 	rts
 
 .endproc
@@ -1881,12 +1844,12 @@ L05C7:	jsr     incsp2
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jeq     L05D9
+	jeq     L05D1
 	ldy     #$04
 	ldx     #$05
 	lda     #$00
 	jsr     addeqysp
-L05D9:	ldy     #$05
+L05D1:	ldy     #$05
 	jsr     ldaxysp
 	jsr     asrax4
 	jsr     aslax4
@@ -1904,282 +1867,9 @@ L05D9:	ldy     #$05
 	tya
 	ldy     #$00
 	jsr     ldauidx
-	jmp     L05D5
-L05D5:	jsr     incsp6
+	jmp     L05CD
+L05CD:	jsr     incsp6
 	rts
-
-.endproc
-
-; ---------------------------------------------------------------
-; void __near__ balls_init (void)
-; ---------------------------------------------------------------
-
-.segment	"CODE"
-
-.proc	_balls_init: near
-
-.segment	"CODE"
-
-	ldx     #$00
-	lda     #$00
-	sta     _i
-L05E5:	ldx     #$00
-	lda     _i
-	cmp     #$3F
-	jsr     boolult
-	jne     L05E8
-	jmp     L05E6
-L05E8:	lda     #<(_ball_x)
-	ldx     #>(_ball_x)
-	clc
-	adc     _i
-	bcc     L05EF
-	inx
-L05EF:	jsr     pushax
-	jsr     _rand8
-	ldy     #$00
-	jsr     staspidx
-	lda     #<(_ball_y)
-	ldx     #>(_ball_y)
-	clc
-	adc     _i
-	bcc     L05F3
-	inx
-L05F3:	jsr     pushax
-	jsr     _rand8
-	ldy     #$00
-	jsr     staspidx
-	jsr     _rand8
-	sta     _j
-	jsr     _rand8
-	jsr     pushax
-	ldx     #$00
-	lda     #$03
-	jsr     tosumodax
-	jsr     incax1
-	sta     _spr
-	lda     #<(_ball_dx)
-	ldx     #>(_ball_dx)
-	clc
-	adc     _i
-	bcc     L05FC
-	inx
-L05FC:	jsr     pushax
-	ldx     #$00
-	lda     _j
-	ldx     #$00
-	and     #$01
-	stx     tmp1
-	ora     tmp1
-	jeq     L05FE
-	ldx     #$00
-	lda     _spr
-	jsr     negax
-	ldx     #$00
-	jmp     L0600
-L05FE:	ldx     #$00
-	lda     _spr
-	ldx     #$00
-L0600:	ldy     #$00
-	jsr     staspidx
-	jsr     _rand8
-	jsr     pushax
-	ldx     #$00
-	lda     #$03
-	jsr     tosumodax
-	jsr     incax1
-	sta     _spr
-	lda     #<(_ball_dy)
-	ldx     #>(_ball_dy)
-	clc
-	adc     _i
-	bcc     L0607
-	inx
-L0607:	jsr     pushax
-	ldx     #$00
-	lda     _j
-	ldx     #$00
-	and     #$02
-	stx     tmp1
-	ora     tmp1
-	jeq     L0609
-	ldx     #$00
-	lda     _spr
-	jsr     negax
-	ldx     #$00
-	jmp     L060B
-L0609:	ldx     #$00
-	lda     _spr
-	ldx     #$00
-L060B:	ldy     #$00
-	jsr     staspidx
-	ldx     #$00
-	inc     _i
-	lda     _i
-	jmp     L05E5
-L05E6:	rts
-
-.endproc
-
-; ---------------------------------------------------------------
-; void __near__ balls_update (void)
-; ---------------------------------------------------------------
-
-.segment	"CODE"
-
-.proc	_balls_update: near
-
-.segment	"CODE"
-
-	ldx     #$00
-	lda     #$00
-	sta     _spr
-	ldx     #$00
-	lda     #$00
-	sta     _i
-L0610:	ldx     #$00
-	lda     _i
-	cmp     #$3F
-	jsr     boolult
-	jne     L0613
-	jmp     L0611
-L0613:	lda     #<(_ball_x)
-	ldx     #>(_ball_x)
-	clc
-	adc     _i
-	bcc     L061C
-	inx
-L061C:	ldy     #$00
-	jsr     ldauidx
-	jsr     pusha
-	lda     #<(_ball_y)
-	ldx     #>(_ball_y)
-	clc
-	adc     _i
-	bcc     L061F
-	inx
-L061F:	ldy     #$00
-	jsr     ldauidx
-	jsr     pusha
-	lda     #$40
-	jsr     pusha
-	ldx     #$00
-	lda     _i
-	ldx     #$00
-	and     #$03
-	jsr     pusha
-	lda     _spr
-	jsr     _oam_spr
-	sta     _spr
-	lda     #<(_ball_x)
-	ldx     #>(_ball_x)
-	clc
-	adc     _i
-	bcc     L0625
-	inx
-L0625:	jsr     pushax
-	ldy     #$00
-	jsr     ldauidx
-	jsr     pushax
-	lda     #<(_ball_dx)
-	ldx     #>(_ball_dx)
-	clc
-	adc     _i
-	bcc     L0628
-	inx
-L0628:	ldy     #$00
-	jsr     ldauidx
-	jsr     tosaddax
-	ldy     #$00
-	jsr     staspidx
-	lda     #<(_ball_y)
-	ldx     #>(_ball_y)
-	clc
-	adc     _i
-	bcc     L062B
-	inx
-L062B:	jsr     pushax
-	ldy     #$00
-	jsr     ldauidx
-	jsr     pushax
-	lda     #<(_ball_dy)
-	ldx     #>(_ball_dy)
-	clc
-	adc     _i
-	bcc     L062E
-	inx
-L062E:	ldy     #$00
-	jsr     ldauidx
-	jsr     tosaddax
-	ldy     #$00
-	jsr     staspidx
-	lda     #<(_ball_x)
-	ldx     #>(_ball_x)
-	clc
-	adc     _i
-	bcc     L0632
-	inx
-L0632:	ldy     #$00
-	jsr     ldauidx
-	cmp     #$F8
-	lda     #$00
-	ldx     #$00
-	rol     a
-	jeq     L062F
-	lda     #<(_ball_dx)
-	ldx     #>(_ball_dx)
-	clc
-	adc     _i
-	bcc     L0636
-	inx
-L0636:	jsr     pushax
-	lda     #<(_ball_dx)
-	ldx     #>(_ball_dx)
-	clc
-	adc     _i
-	bcc     L0639
-	inx
-L0639:	ldy     #$00
-	jsr     ldauidx
-	jsr     negax
-	ldy     #$00
-	jsr     staspidx
-L062F:	lda     #<(_ball_y)
-	ldx     #>(_ball_y)
-	clc
-	adc     _i
-	bcc     L063D
-	inx
-L063D:	ldy     #$00
-	jsr     ldauidx
-	cmp     #$E8
-	lda     #$00
-	ldx     #$00
-	rol     a
-	jeq     L0612
-	lda     #<(_ball_dy)
-	ldx     #>(_ball_dy)
-	clc
-	adc     _i
-	bcc     L0641
-	inx
-L0641:	jsr     pushax
-	lda     #<(_ball_dy)
-	ldx     #>(_ball_dy)
-	clc
-	adc     _i
-	bcc     L0644
-	inx
-L0644:	ldy     #$00
-	jsr     ldauidx
-	jsr     negax
-	ldy     #$00
-	jsr     staspidx
-L0612:	ldx     #$00
-	inc     _i
-	lda     _i
-	jmp     L0610
-L0611:	rts
 
 .endproc
 
@@ -2191,31 +1881,32 @@ L0611:	rts
 
 .proc	_main: near
 
-.segment	"ZEROPAGE"
+.segment	"BSS"
 
-L0646:
+L05DD:
 	.res	1,$00
-L0647:
+L05DE:
 	.res	1,$00
-L0648:
+L05DF:
 	.res	1,$00
-L0649:
+L05E0:
 	.res	1,$00
-L064A:
+L05E1:
 	.res	1,$00
-L064B:
+L05E2:
 	.res	2,$00
-L064C:
+L05E3:
 	.res	2,$00
 
 .segment	"CODE"
 
-	lda     #<(_palBackground)
-	ldx     #>(_palBackground)
+	lda     #<(_palette)
+	ldx     #>(_palette)
 	jsr     _pal_bg
-	lda     #<(_palSprites)
-	ldx     #>(_palSprites)
-	jsr     _pal_spr
+	lda     #$11
+	jsr     pusha
+	lda     #$30
+	jsr     _pal_col
 	ldx     #$00
 	lda     #$60
 	sta     _update_list
@@ -2243,225 +1934,217 @@ L064C:
 	jsr     _preload_screen
 	ldx     #$00
 	lda     #$F0
-	sta     L064B
-	stx     L064B+1
+	sta     L05E2
+	stx     L05E2+1
 	ldx     #$00
 	lda     #$00
-	sta     L064C
-	stx     L064C+1
+	sta     L05E3
+	stx     L05E3+1
 	ldx     #$00
 	lda     #$80
-	sta     L0649
+	sta     L05E0
 	ldx     #$00
 	lda     #$78
-	sta     L064A
-	jsr     _balls_init
+	sta     L05E1
 	jsr     _ppu_on_all
 	lda     #$3C
 	jsr     _delay
-L0674:	jsr     _ppu_wait_nmi
-	ldx     #$00
-	lda     #$00
-	sta     $401E
+L060B:	jsr     _ppu_wait_nmi
 	ldx     #$00
 	lda     #$00
 	jsr     _set_vram_update
-	lda     L064B
-	ldx     L064B+1
+	lda     L05E2
+	ldx     L05E2+1
 	ldx     #$00
 	and     #$07
 	jsr     bnegax
-	jeq     L067C
-	lda     L064C
-	ldx     L064C+1
+	jeq     L0611
+	lda     L05E3
+	ldx     L05E3+1
 	jsr     asrax3
 	ldy     #$3B
 	jsr     incaxy
-	sta     L0648
+	sta     L05DF
 	ldx     #$00
-	lda     L0648
+	lda     L05DF
 	cmp     #$3C
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jeq     L0682
+	jeq     L0617
 	ldx     #$00
-	lda     L0648
+	lda     L05DF
 	sec
 	sbc     #$3C
-	sta     L0648
-L0682:	lda     L0648
+	sta     L05DF
+L0617:	lda     L05DF
 	jsr     pusha
-	lda     L064B
-	ldx     L064B+1
+	lda     L05E2
+	ldx     L05E2+1
 	jsr     shrax4
 	jsr     pushax
 	jsr     _prepare_row_update
 	lda     #<(_update_list)
 	ldx     #>(_update_list)
 	jsr     _set_vram_update
-L067C:	ldx     #$00
+L0611:	ldx     #$00
 	lda     #$00
 	jsr     pushax
-	lda     L064C
-	ldx     L064C+1
+	lda     L05E3
+	ldx     L05E3+1
 	jsr     _scroll
-	inc     L064B
-	bne     L068F
-	inc     L064B+1
-L068F:	lda     L064B
-	ldx     L064B+1
-	lda     L064B
-	ldx     L064B+1
+	inc     L05E2
+	bne     L0624
+	inc     L05E2+1
+L0624:	lda     L05E2
+	ldx     L05E2+1
+	lda     L05E2
+	ldx     L05E2+1
 	cmp     #$00
 	txa
 	sbc     #$05
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jeq     L0690
+	jeq     L0625
 	ldx     #$00
 	lda     #$00
-	sta     L064B
-	stx     L064B+1
-L0690:	lda     L064C
+	sta     L05E2
+	stx     L05E2+1
+L0625:	lda     L05E3
 	sec
 	sbc     #$01
-	sta     L064C
-	bcs     L0697
-	dec     L064C+1
-L0697:	ldx     L064C+1
-	lda     L064C
-	ldx     L064C+1
+	sta     L05E3
+	bcs     L062C
+	dec     L05E3+1
+L062C:	ldx     L05E3+1
+	lda     L05E3
+	ldx     L05E3+1
 	cpx     #$80
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jeq     L0698
+	jeq     L062D
 	ldx     #$01
 	lda     #$DF
-	sta     L064C
-	stx     L064C+1
-L0698:	lda     L064B
-	ldx     L064B+1
+	sta     L05E3
+	stx     L05E3+1
+L062D:	lda     L05E2
+	ldx     L05E2+1
 	jsr     pushax
 	ldx     #$00
-	lda     L0649
+	lda     L05E0
 	ldx     #$00
 	jsr     pushax
 	ldx     #$00
-	lda     L064A
+	lda     L05E1
 	ldx     #$00
 	jsr     pushax
 	jsr     _get_metatile
-	sta     L0647
+	sta     L05DE
 	ldx     #$00
-	lda     L0647
+	lda     L05DE
 	jsr     bnega
-	jeq     L06A1
+	jeq     L0636
 	ldx     #$00
 	lda     #$1F
-	sta     L0647
-	jmp     L06A5
-L06A1:	ldx     #$00
+	sta     L05DE
+	jmp     L063A
+L0636:	ldx     #$00
 	lda     #$20
 	clc
-	adc     L0647
-	sta     L0647
-L06A5:	ldx     #$00
-	lda     L0649
+	adc     L05DE
+	sta     L05DE
+L063A:	ldx     #$00
+	lda     L05E0
 	jsr     decax4
 	jsr     pusha
 	ldx     #$00
-	lda     L064A
+	lda     L05E1
 	jsr     decax4
 	jsr     pusha
-	lda     L0647
+	lda     L05DE
 	jsr     pusha
 	lda     #$00
 	jsr     pusha
-	lda     #$FC
+	lda     #$00
 	jsr     _oam_spr
 	lda     #$00
 	jsr     _pad_poll
-	sta     L0646
+	sta     L05DD
 	ldx     #$00
-	lda     L0646
+	lda     L05DD
 	ldx     #$00
 	and     #$40
 	stx     tmp1
 	ora     tmp1
-	jeq     L06B3
+	jeq     L0648
 	ldx     #$00
-	lda     L0649
+	lda     L05E0
 	cmp     #$05
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jeq     L06B3
+	jeq     L0648
 	ldx     #$00
-	lda     L0649
+	lda     L05E0
 	sec
 	sbc     #$02
-	sta     L0649
-L06B3:	ldx     #$00
-	lda     L0646
+	sta     L05E0
+L0648:	ldx     #$00
+	lda     L05DD
 	ldx     #$00
 	and     #$80
 	stx     tmp1
 	ora     tmp1
-	jeq     L06B9
+	jeq     L064E
 	ldx     #$00
-	lda     L0649
+	lda     L05E0
 	cmp     #$FC
 	jsr     boolult
-	jeq     L06B9
+	jeq     L064E
 	ldx     #$00
 	lda     #$02
 	clc
-	adc     L0649
-	sta     L0649
-L06B9:	ldx     #$00
-	lda     L0646
+	adc     L05E0
+	sta     L05E0
+L064E:	ldx     #$00
+	lda     L05DD
 	ldx     #$00
 	and     #$10
 	stx     tmp1
 	ora     tmp1
-	jeq     L06BF
+	jeq     L0654
 	ldx     #$00
-	lda     L064A
+	lda     L05E1
 	cmp     #$05
 	lda     #$00
 	ldx     #$00
 	rol     a
-	jeq     L06BF
+	jeq     L0654
 	ldx     #$00
-	lda     L064A
+	lda     L05E1
 	sec
 	sbc     #$02
-	sta     L064A
-L06BF:	ldx     #$00
-	lda     L0646
+	sta     L05E1
+L0654:	ldx     #$00
+	lda     L05DD
 	ldx     #$00
 	and     #$20
 	stx     tmp1
 	ora     tmp1
-	jeq     L06C5
+	jeq     L065A
 	ldx     #$00
-	lda     L064A
+	lda     L05E1
 	cmp     #$EC
 	jsr     boolult
-	jeq     L06C5
+	jeq     L065A
 	ldx     #$00
 	lda     #$02
 	clc
-	adc     L064A
-	sta     L064A
-L06C5:	jsr     _balls_update
-	ldx     #$00
-	lda     #$00
-	sta     $401F
-	jmp     L0674
+	adc     L05E1
+	sta     L05E1
+L065A:	jmp     L060B
 	rts
 
 .endproc
